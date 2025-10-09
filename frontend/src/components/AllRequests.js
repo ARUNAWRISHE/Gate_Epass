@@ -5,6 +5,7 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import CreateAORequestPopup from "./CreateAORequestPopup";
 import Swal from "sweetalert2";
+import "./PrincipalRequests.css";
 
 function Requests() {
   const [requests, setRequests] = useState([]);
@@ -246,273 +247,115 @@ const submitRemarks = async (id) => {
     setIsPopupOpen(false);
   };
 
-  return ( 
-    <div className="container mt-5">
-<nav className="navbar navbar-expand-lg navbar-light bg-light">
-  <div className="container-fluid">
-    <span className="navbar-brand mb-0 h1">
-      <h1 className="m-2">AO Dashboard</h1>
-    </span>
-    <button className="btn btn-success" onClick={openPopup}>Create AO Request</button>
+  return (
+    <div className="princ-root">
+      <header className="princ-header">
+        <h1>AO Dashboard</h1>
+        <div className="tabs">
+          <button className={`tab ${selectedTab === "pending" ? "active" : ""}`} onClick={() => setSelectedTab("pending")}>Pending</button>
+          <button className={`tab ${selectedTab === "approved" ? "active" : ""}`} onClick={() => setSelectedTab("approved")}>Approved</button>
+          <button className={`tab ${selectedTab === "past" ? "active" : ""}`} onClick={() => setSelectedTab("past")}>Logs</button>
+        </div>
+      </header>
 
-    <CreateAORequestPopup
-      isOpen={isPopupOpen}
-      onClose={closePopup}
-      onSubmit={(data) => console.log("Form submitted:", data)}
-    />
-
-    <div className="d-flex flex-wrap gap-2">
-      <button
-        className={`btn ${selectedTab === "pending" ? "btn-primary" : "btn-outline-primary"} rounded-pill px-4 py-2`}
-        onClick={() => setSelectedTab("pending")}
-      >
-        Pending Requests
-      </button>
-      <button
-        className={`btn ${selectedTab === "past" ? "btn-primary" : "btn-outline-primary"} rounded-pill px-4 py-2`}
-        onClick={() => setSelectedTab("past")}
-      >
-        Logs
-      </button>
-      <button
-    className={`btn ${
-      selectedTab === "approved" ? "btn-primary" : "btn-outline-primary"
-    } rounded-pill px-4 py-2`}
-    onClick={() => setSelectedTab("approved")}
-  >
-    Approved Requests
-  </button>
-    </div>
-  </div>
-</nav>
-
-      <h2 className="text-center mb-4">All Requests</h2>
-      <div className="d-flex justify-content-between mb-3">
-      </div>
-
-      <div className="row mb-3">
-        <div className="col-md-6">
-          <select
-            className="form-select bg-white"
-            value={selectedDepartment}
-            onChange={handleDepartmentFilter}
-          >
+      <main className="princ-main">
+        <div className="controls">
+          <button className="btn btn-success" onClick={openPopup}>Create AO Request</button>
+          <select className="select" value={selectedDepartment} onChange={handleDepartmentFilter}>
             <option value="">All Departments</option>
             {departments.map((dept) => (
-              <option key={dept} value={dept}>
-                {dept}
-              </option>
+              <option key={dept} value={dept}>{dept}</option>
             ))}
           </select>
+          <input className="search" placeholder="Search by name or event" value={search} onChange={handleSearch} />
         </div>
-        <div className="col-md-6 text-end">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search by name or event"
-            value={search}
-            onChange={handleSearch}
-          />
-        </div>
-      </div>
 
-      {error && <div className="alert alert-danger">{error}</div>}
-      {loading ? (
-  <div className="text-center">
-    <div className="spinner-border text-primary" role="status">
-      <span className="visually-hidden">Loading...</span>
-    </div>
-  </div>
-) : filteredRequests.length === 0 ? (
-  <div className="text-center mt-3">
-    <h5>No requests are pending.</h5>
-  </div>
-) : (
-  <div className="table-responsive">
-    <table className="table table-bordered table-striped">
-    <thead className="table-dark">
-  <tr>
-    <th>ID</th>
-    <th>Event Name</th>
-    <th>Event Date</th>
-    <th>Time In</th>
-    <th>Time Out</th>
-    {selectedTab === "approved" && (
-      <>
-        <th>Actual In Time</th>
-        <th>Actual Out Time</th>
-      </>
-    )}
-    {selectedTab !== "approved" && (
-      <>
-        <th>Faculty Name</th>
-        <th>Department</th>
-        <th>View Details</th>
-        <th>Approval Letter</th>
-        <th>Status</th>
-        {selectedTab === "pending" && <th>Actions</th>}
-      </>
-    )}
-  </tr>
-</thead>
-<tbody>
-  {currentRequests.map((req) => (
-    <tr key={req.id}>
-      <td>{req.id}</td>
-      <td>{req.event_name}</td>
-      <td>{req.event_date}</td>
-      <td>{req.time_in}</td>
-      <td>{req.time_out}</td>
-      {selectedTab === "approved" && (
-        <>
-          <td>{req.Actual_intime}</td>
-          <td>{req.Actual_outtime}</td>
-        </>
-      )}
-      {selectedTab !== "approved" && (
-        <>
-          <td>{req.name}</td>
-          <td>{req.department}</td>
-          <td>
-            <button
-              className="btn btn-info btn-sm me-2"
-              onClick={() => handleViewDetails(req)}
-            >
-              View Details
-            </button>
-          </td>
-          <td>
-            <button
-              className="btn btn-primary btn-sm me-2"
-              onClick={() => handleViewLetter(req.approval_letter)}
-            >
-              View Letter
-            </button>
-          </td>
-          <td>{req.status}</td>
-          {selectedTab === "pending" && req.status === "Principal Approved" &&(
-            <td>
-              <button
-                className="btn btn-success btn-sm fixed-btn me-2 mt-2 w-50"
-                onClick={() => handleStatusUpdate(req.id, "Accepted")}
-              >
-                Approve
-              </button>
-              <button
-                className="btn btn-danger btn-sm fixed-btn me-2 mt-2 w-50"
-                onClick={() => handleStatusUpdate(req.id, "Rejected")}
-              >
-                Reject
-              </button>
-              
-              <button
-  className="btn btn-warning btn-sm fixed-btn me-2 mt-2 w-50"
-  onClick={() => handleStatusUpdate(req.id, "Give Remarks")}
->
-  ReCreate
-</button>
+        {error && <div className="error">{error}</div>}
 
-{recreateRequestId === req.id && (
-  <div className="mt-2">
-    <textarea
-      className="form-control"
-      placeholder="Enter your remarks..."
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-    />
-    <button className="btn btn-primary btn-sm mt-2" onClick={() => submitRemarks(req.id)}>
-      Submit
-    </button>
-  </div>
-)}
+        {loading ? (
+          <div className="loader">Loading...</div>
+        ) : filteredRequests.length === 0 ? (
+          <div className="empty">No requests found.</div>
+        ) : (
+          <div className="requests-grid">
+            {currentRequests.map((req) => (
+              <div className="card" key={req.id}>
+                <div className="card-head">
+                  <div className="id">{req.id}</div>
+                  <div className="status">{req.status}</div>
+                </div>
+                <div className="card-body">
+                  <h3 className="event">{req.event_name}</h3>
+                  <p className="meta">{req.event_date} • {req.time_in} - {req.time_out}</p>
+                  <p className="faculty">{req.name} — {req.department}</p>
+                </div>
+                <div className="card-actions">
+                  <button className="btn btn-primary" onClick={() => handleViewDetails(req)}>Details</button>
+                  <button className="btn btn-outline" onClick={() => handleViewLetter(req.approval_letter)}>Letter</button>
+                  {selectedTab === "pending" && req.status === "Principal Approved" && (
+                    <div className="action-row">
+                      <button className="btn approve" onClick={() => handleStatusUpdate(req.id, "Accepted")}>Approve</button>
+                      <button className="btn reject" onClick={() => handleStatusUpdate(req.id, "Rejected")}>Reject</button>
+                      <button className="btn" onClick={() => handleStatusUpdate(req.id, "Give Remarks")}>ReCreate</button>
+                    </div>
+                  )}
+                </div>
+                {recreateRequestId === req.id && (
+                  <div className="mt-2">
+                    <textarea className="form-control" placeholder="Enter your remarks..." value={comment} onChange={(e) => setComment(e.target.value)} />
+                    <button className="btn btn-primary btn-sm mt-2" onClick={() => submitRemarks(req.id)}>Submit</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
-            </td>
-          )}
-        </>
-      )}
-    </tr>
-  ))}
-</tbody>
-    </table>
-  </div>
-)}
-      <div className="d-flex justify-content-between mt-3">
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => handlePagination("prev")}
-          disabled={currentPage === 1}
-        >
-          &laquo; Previous
-        </button>
-        <span>
-          Page {currentPage} of{" "}
-          {Math.ceil(filteredRequests.length / requestsPerPage)}
-        </span>
-        <button
-          className="btn btn-outline-primary"
-          onClick={() => handlePagination("next")}
-          disabled={
-            currentPage === Math.ceil(filteredRequests.length / requestsPerPage)
-          }
-        >
-          Next &raquo;
-        </button>
-      </div>
-      {showCommentBox && (
-  <div className="mt-3">
-    <textarea
-      className="form-control"
-      rows="3"
-      placeholder="Enter your remarks here..."
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-    ></textarea>
-    <button className="btn btn-primary mt-2" onClick={handleSubmitComment}>
-      Submit Remarks
-    </button>
-    <button className="btn btn-secondary mt-2 ms-2" onClick={() => setShowCommentBox(false)}>
-      Cancel
-    </button>
-  </div>
-)}
-
-
-      <CSVLink
-        data={filteredRequests}
-        filename="requests.csv"
-        className="btn btn-success mt-3"
-      >
-        Download CSV
-      </CSVLink>
-
-      {/* Modal for Viewing Details */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Request Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {modalData && (
-            <div>
-              <p><strong>ID:</strong> {modalData.id}</p>
-              <p><strong>Faculty Name:</strong> {modalData.name}</p>
-              <p><strong>Department:</strong> {modalData.department}</p>
-              <p><strong>Event Name:</strong> {modalData.event_name}</p>
-              <p><strong>Event Date:</strong> {modalData.event_date}</p>
-              <p><strong> Guest Name:</strong> {modalData.guest_name}</p>
-              <p><strong>Actual Intime</strong> {modalData.Actual_intime}</p>
-              <p><strong>Actual Outtime</strong> {modalData.Actual_outtime}</p>
-
-              
-              {/* Add more details if needed */}
+        {showCommentBox && (
+          <div className="comment-box">
+            <textarea value={comment} onChange={(e)=>setComment(e.target.value)} placeholder="Enter remarks"></textarea>
+            <div className="comment-actions">
+              <button className="btn btn-primary" onClick={handleSubmitComment}>Submit</button>
+              <button className="btn btn-secondary" onClick={()=>setShowCommentBox(false)}>Cancel</button>
             </div>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </div>
+        )}
+
+        <div className="footer-bar">
+          <div className="pagination">
+            <button onClick={() => handlePagination('prev')} disabled={currentPage===1} className="pg">Prev</button>
+            <span className="page-info">Page {currentPage} of {Math.ceil(filteredRequests.length / requestsPerPage)}</span>
+            <button onClick={() => handlePagination('next')} disabled={currentPage===Math.ceil(filteredRequests.length / requestsPerPage)} className="pg">Next</button>
+          </div>
+          <CSVLink data={filteredRequests} filename="requests.csv" className="download">Download CSV</CSVLink>
+        </div>
+
+        {/* Modal for Viewing Details */}
+        <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
+          <Modal.Header closeButton>
+            <Modal.Title>Request Details</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {modalData && (
+              <div className="modal-details">
+                <p><strong>ID:</strong> {modalData.id}</p>
+                <p><strong>Faculty Name:</strong> {modalData.name}</p>
+                <p><strong>Department:</strong> {modalData.department}</p>
+                <p><strong>Event Name:</strong> {modalData.event_name}</p>
+                <p><strong>Event Date:</strong> {modalData.event_date}</p>
+                <p><strong> Guest Name:</strong> {modalData.guest_name}</p>
+                <p><strong>Actual Intime</strong> {modalData.Actual_intime}</p>
+                <p><strong>Actual Outtime</strong> {modalData.Actual_outtime}</p>
+              </div>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="secondary" onClick={() => setShowModal(false)}>Close</Button>
+          </Modal.Footer>
+        </Modal>
+
+        <CreateAORequestPopup isOpen={isPopupOpen} onClose={closePopup} onSubmit={(data) => console.log("Form submitted:", data)} />
+      </main>
     </div>
   );
 }
