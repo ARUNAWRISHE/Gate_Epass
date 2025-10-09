@@ -116,7 +116,7 @@ function HodHome() {
     <Container maxWidth="lg" sx={styles.container}>
       <Box sx={styles.header}>
         <Typography variant="h4" sx={styles.userName}>
-          Welcome, {user.name}
+          Welcome HOD of {user.department} Department
         </Typography>
         <Button
           variant="contained"
