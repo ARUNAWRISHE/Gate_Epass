@@ -104,7 +104,7 @@ function HodHome() {
           padding: "6px 12px",
           display: "inline-block",
           minWidth: "120px",
-          boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.2)",
+          boxShadow: "0px 2px 6px rgba(9, 96, 237, 0.2)",
         }}
       >
         {status || "Unknown"}
