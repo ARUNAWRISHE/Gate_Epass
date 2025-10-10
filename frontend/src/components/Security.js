@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import jsQR from 'jsqr';
-import Swal from 'sweetalert2'; // Import SweetAlert2
+import Swal from 'sweetalert2';
+import { Link } from 'react-router-dom';
 
 const QRScanner = () => {
     const [otp, setOtp] = useState('');
@@ -209,9 +210,35 @@ const QRScanner = () => {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/';
+    };
+
     return (
-        <div className="container mt-4">
-            <h2 className="text-center fw-bold mb-4 text-primary">Security QR Scanner</h2>
+        <div>
+            {/* Navbar */}
+            <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#0f52fc', color: 'white' }}>
+                <div className="container">
+                    <Link className="navbar-brand d-flex align-items-center text-white" to="/security">
+                        <i className="bi bi-shield-check me-2"></i>
+                        <span>Security Dashboard</span>
+                    </Link>
+                    <div className="header-actions ms-auto">
+                        <button 
+                            className="btn btn-outline-light inline-logout-btn" 
+                            onClick={handleLogout}
+                        >
+                            <i className="bi bi-box-arrow-right me-1"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <div className="container mt-4">
+                <h2 className="text-center fw-bold mb-4 text-primary">Security QR Scanner</h2>
 
             <div className="d-flex justify-content-center mb-4">
                 <button 
@@ -283,8 +310,8 @@ const QRScanner = () => {
                     border-radius: 8px;
                 }
             `}</style>
+            </div>
         </div>
-        
     );
 };
 
