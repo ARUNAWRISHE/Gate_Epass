@@ -48,17 +48,22 @@ const AdminPage = () => {
               </li>
             </ul>
           </div>
+
+        </div>
+        <div className="header-actions">
+          <button className="btn btn-outline-light inline-logout-btn" onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}>
+            Logout
+          </button>
         </div>
       </nav>
 
-      {/* Main Content Area */}
-      <div className="container mt-4">
+      <main className="princ-main">
         <Routes>
           <Route path="/" element={<AdminHome />} /> {/* Default Home */}
           <Route path="/add-show-hods" element={<AddHodAndShowHodsPage />} />
           <Route path="/all-requests" element={<AdminLog/>} />
         </Routes>
-      </div>
+      </main>
     </div>
   );
 };
