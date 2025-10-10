@@ -59,6 +59,23 @@ html, body {
   }
 }
 
+/* Global logout button */
+.app-logout-btn {
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 0.9rem;
+  opacity: 0.95;
+}
+
+.app-logout-btn:hover {
+  opacity: 1;
+}
+
+/* Inline header logout button (no sticky behavior) */
+.inline-logout-btn {
+  margin-left: 12px;
+}
+
 /* If the app's login uses a different root wrapper, apply a defensive rule */
 .login-wrapper, .login-root, .auth-root {
   display: flex;

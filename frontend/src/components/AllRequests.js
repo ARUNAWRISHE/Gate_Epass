@@ -256,6 +256,14 @@ const submitRemarks = async (id) => {
           <button className={`tab ${selectedTab === "approved" ? "active" : ""}`} onClick={() => setSelectedTab("approved")}>Approved</button>
           <button className={`tab ${selectedTab === "past" ? "active" : ""}`} onClick={() => setSelectedTab("past")}>Logs</button>
         </div>
+        <div className="header-actions">
+          <button
+            className="btn btn-outline-light inline-logout-btn"
+            onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <main className="princ-main">

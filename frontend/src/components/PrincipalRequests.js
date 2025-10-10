@@ -241,6 +241,14 @@ function PrincipalRequests() {
             Logs
           </button>
         </div>
+        <div className="header-actions">
+          <button
+            className="btn btn-outline-light inline-logout-btn"
+            onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}
+          >
+            Logout
+          </button>
+        </div>
       </header>
 
       <main className="princ-main">

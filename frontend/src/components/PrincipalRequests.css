@@ -24,6 +24,10 @@
 
 .tabs { display:flex; gap:8px; }
 
+.header-actions { display:flex; align-items:center; gap:12px; }
+
+.header-actions .inline-logout-btn { color: #fff; border-color: rgba(255,255,255,0.18); background: transparent; }
+
 .tab {
   background: transparent;
   border: 1px solid rgba(255,255,255,0.12);

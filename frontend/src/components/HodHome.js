@@ -2,22 +2,10 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { fetchRequests, createRequest } from "../api";
 import CreateRequestPopup from "./CreateRequestPopup";
-import {
-  Container,
-  Typography,
-  Button,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  CircularProgress,
-  TablePagination,
-  Box,
-} from "@mui/material";
+import { Box, Button } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import { CSVLink } from "react-csv";
+import "./PrincipalRequests.css";
 
 function HodHome() {
   const location = useLocation();
@@ -26,8 +14,11 @@ function HodHome() {
   const [showPopup, setShowPopup] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [selectedTab, setSelectedTab] = useState("pending");
+  const [search, setSearch] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
 
-  // Pagination
+  // Pagination (page is zero-based)
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -54,6 +45,38 @@ function HodHome() {
   useEffect(() => {
     loadRequests();
   }, [loadRequests]);
+
+  // Departments list can be derived from requests or fetched separately; derive here
+  const departments = Array.from(new Set(requests.map((r) => r.department).filter(Boolean)));
+
+  const handleSearch = (e) => {
+    setSearch(e.target.value.toLowerCase());
+    setPage(0);
+  };
+
+  const handleDepartmentFilter = (e) => {
+    setSelectedDepartment(e.target.value);
+    setPage(0);
+  };
+
+  const filterByTab = (items) => {
+    const tab = selectedTab;
+    if (tab === "pending") return items.filter((i) => !i.status || /pending/i.test(i.status));
+    if (tab === "approved") return items.filter((i) => /accepted|approved/i.test(i.status));
+    if (tab === "past") return items.filter((i) => /rejected|past/i.test(i.status));
+    return items;
+  };
+
+  const filteredRequests = filterByTab(requests).filter((req) => {
+    const matchesSearch =
+      !search || req.event_name?.toLowerCase().includes(search) || req.name?.toLowerCase().includes(search) || req.guest_name?.toLowerCase().includes(search);
+    const matchesDept = !selectedDepartment || req.department === selectedDepartment;
+    return matchesSearch && matchesDept;
+  });
+
+  const indexOfFirst = page * rowsPerPage;
+  const indexOfLast = indexOfFirst + rowsPerPage;
+  const currentRequests = filteredRequests.slice(indexOfFirst, indexOfLast);
 
   // Handle New Request Submission
   const handleNewRequest = async (formData) => {
@@ -113,86 +136,78 @@ function HodHome() {
   };
 
   return (
-    <Container maxWidth="lg" sx={styles.container}>
-      <Box sx={styles.header}>
-        <Typography variant="h4" sx={styles.userName}>
-          Welcome, {user.name}
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => setShowPopup(true)}
-          disabled={isSubmitting}
-          sx={styles.createBtn}
-        >
-          {isSubmitting ? "Creating..." : "Create Request"}
-        </Button>
-      </Box>
+    <div className="princ-root">
+      <header className="princ-header">
+        <h1>Welcome, HOD of {user.department} department</h1>
+        <div className="tabs">
+          <button className={`tab ${selectedTab === "pending" ? "active" : ""}`} onClick={() => setSelectedTab("pending")}>Pending</button>
+          <button className={`tab ${selectedTab === "approved" ? "active" : ""}`} onClick={() => setSelectedTab("approved")}>Approved</button>
+          <button className={`tab ${selectedTab === "past" ? "active" : ""}`} onClick={() => setSelectedTab("past")}>Logs</button>
+        </div>
+        <div className="header-actions">
+          <button className="btn btn-outline-light" onClick={() => setShowPopup(true)}>
+            <AddIcon sx={{ mr: 1 }} /> Create Request
+          </button>
+          <button className="btn btn-outline-light inline-logout-btn" onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}>
+            Logout
+          </button>
+        </div>
+      </header>
 
-      {/* Popup Dialog for Creating Request */}
-      {showPopup && (
-        <CreateRequestPopup
-          isOpen={showPopup}
-          onClose={() => setShowPopup(false)}
-          onSubmit={handleNewRequest}
-          hodId={user.id}
-        />
-      )}
+      <main className="princ-main">
+        <div className="controls">
+          <select className="select" value={selectedDepartment} onChange={handleDepartmentFilter}>
+            <option value="">All Departments</option>
+            {departments.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+          <input className="search" placeholder="Search by name, event, guest" value={search} onChange={handleSearch} />
+          <CSVLink data={filteredRequests} filename="hod-requests.csv" className="download">Download CSV</CSVLink>
+        </div>
 
-      {/* Request Table */}
-      <TableContainer component={Paper} sx={styles.tableContainer}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={styles.th}>ID</TableCell>
-              <TableCell sx={styles.th}>Event Name</TableCell>
-              <TableCell sx={styles.th}>Guest Name</TableCell>
-              <TableCell sx={styles.th}>Event Date</TableCell>
-              <TableCell sx={styles.th}>Remarks</TableCell>
-              <TableCell sx={styles.th}>Status</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6} sx={styles.loadingContainer}>
-                  <CircularProgress size={30} color="primary" />
-                </TableCell>
-              </TableRow>
-            ) : requests.length > 0 ? (
-              requests
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((req) => (
-                  <TableRow key={req.id} sx={styles.row}>
-                    <TableCell>{req.id}</TableCell>
-                    <TableCell>{req.event_name}</TableCell>
-                    <TableCell>{req.guest_name}</TableCell>
-                    <TableCell>{req.event_date}</TableCell>
-                    <TableCell>{req.remarks || "No Remarks"}</TableCell>
-                    <TableCell>{getStatusBadge(req.status)}</TableCell>
-                  </TableRow>
-                ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={6} sx={styles.noData}>
-                  No requests found
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+        {loading ? (
+          <div className="loader">Loading...</div>
+        ) : filteredRequests.length === 0 ? (
+          <div className="empty">No requests found.</div>
+        ) : (
+          <div className="requests-grid">
+            {currentRequests.map((req) => (
+              <div className="card" key={req.id}>
+                <div className="card-head">
+                  <div className="id">{req.id}</div>
+                  <div className="status">{req.status}</div>
+                </div>
+                <div className="card-body">
+                  <h3 className="event">{req.event_name}</h3>
+                  <p className="meta">{req.event_date}</p>
+                  <p className="faculty">{req.guest_name} — {req.department}</p>
+                </div>
+                <div className="card-actions">
+                  <button className="btn btn-primary">Details</button>
+                  <div className="action-row">
+                    {getStatusBadge(req.status)}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
-      {/* Pagination */}
-      <TablePagination
-        component="div"
-        count={requests.length}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
-    </Container>
+        <div className="footer-bar">
+          <div className="pagination">
+            <button onClick={() => handleChangePage(null, Math.max(0, page-1))} disabled={page===0} className="pg">Prev</button>
+            <span className="page-info">Page {page+1} of {Math.max(1, Math.ceil(filteredRequests.length / rowsPerPage))}</span>
+            <button onClick={() => handleChangePage(null, Math.min(Math.ceil(filteredRequests.length / rowsPerPage)-1, page+1))} disabled={page>=Math.ceil(filteredRequests.length / rowsPerPage)-1} className="pg">Next</button>
+          </div>
+          <div />
+        </div>
+
+        {showPopup && (
+          <CreateRequestPopup isOpen={showPopup} onClose={() => setShowPopup(false)} onSubmit={handleNewRequest} hodId={user.id} />
+        )}
+      </main>
+    </div>
   );
 }
 
