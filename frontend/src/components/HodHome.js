@@ -138,7 +138,7 @@ function HodHome() {
   return (
     <div className="princ-root">
       <header className="princ-header">
-        <h1>Welcome, HOD of {user.department} department</h1>
+        <h1>HOD of {user.department} department dashboard</h1>
         <div className="tabs">
           <button className={`tab ${selectedTab === "pending" ? "active" : ""}`} onClick={() => setSelectedTab("pending")}>Pending</button>
           <button className={`tab ${selectedTab === "approved" ? "active" : ""}`} onClick={() => setSelectedTab("approved")}>Approved</button>
