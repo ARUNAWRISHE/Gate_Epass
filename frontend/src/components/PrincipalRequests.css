@@ -1,0 +1,109 @@
+/* Blue & white minimal theme for PrincipalRequests */
+.princ-root {
+  font-family: Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, system-ui;
+  background: #f7fbff;
+  color: #0b2545;
+  min-height: 100vh;
+}
+
+.princ-header {
+  background: #0b63d6; /* solid blue */
+  color: #ffffff;
+  padding: 18px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.princ-header h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.tabs { display:flex; gap:8px; }
+
+.header-actions { display:flex; align-items:center; gap:12px; }
+
+.header-actions .inline-logout-btn { color: #fff; border-color: rgba(255,255,255,0.18); background: transparent; }
+
+.tab {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.9);
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tab.active { background: #08306b; color: #fff; }
+
+.princ-main { padding: 20px 28px; }
+
+.controls { display:flex; gap:12px; align-items:center; margin-bottom:18px; }
+
+.select { padding:8px 10px; border-radius:8px; border:1px solid #d9e9ff;}
+
+.search { flex:1; padding:8px 12px; border-radius:8px; border:1px solid #d9e9ff;}
+
+/* Make placeholder visible */
+/* .search::placeholder { color: #7b93b6; opacity:1; } */
+
+/* Focus / active styles to avoid confusing states */
+.search:focus, .select:focus, .search:active, .select:active {
+  outline: none;
+  border-color: #0b63d6;
+  box-shadow: 0 6px 20px rgba(11,99,214,0.12);
+  /* keep text color unchanged on focus */
+}
+
+/* When focused, keep placeholder slightly lighter but visible */
+.search:focus::placeholder { color: #9fb7db; }
+
+/* Ensure select text visible on some browsers */
+.select::-ms-expand { display: none; }
+
+.loader, .empty, .error { text-align:center; margin:40px 0; }
+
+.requests-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:16px; }
+
+.card { background:#fff; border-radius:10px; padding:14px; box-shadow:0 6px 16px rgba(3,23,52,0.04); border:1px solid #eef6ff; display:flex; flex-direction:column; justify-content:space-between; }
+
+.card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+
+.id { font-weight:600; color:#0b2545; }
+
+.status { background:#eef6ff; color:#0b63d6; padding:6px 10px; border-radius:999px; font-size:12px; }
+
+.card-body .event { margin:0 0 6px 0; font-size:16px; color:#08306b; }
+
+.card-body .meta, .card-body .faculty { margin:0; color:#405a7a; font-size:13px; }
+
+.card-actions { display:flex; gap:8px; margin-top:12px; align-items:center; flex-wrap:wrap; }
+
+.btn { padding:8px 12px; border-radius:8px; cursor:pointer; border:none; }
+.btn-primary { background:#0b63d6; color:#fff; }
+.btn-outline { background:transparent; color:#0b63d6; border:1px solid #d9e9ff; }
+.approve { background:#0bb27f; color:#fff; }
+.reject { background:#ff5c5c; color:#fff; }
+
+.action-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+
+.action-row .btn { padding:8px 10px; white-space:nowrap; }
+
+.footer-bar { display:flex; justify-content:space-between; align-items:center; margin-top:18px; padding-top:12px; border-top:1px solid #eef6ff; }
+
+.pagination { display:flex; align-items:center; gap:12px; }
+.pagination .pg { padding:8px 12px; border-radius:8px; border:1px solid #e6f0ff; background:#fff; color:#07305a; }
+.pagination .page-info { font-size:14px; color:#0b2545; }
+.pagination .pg:disabled, .pagination .pg[disabled] { opacity:0.45; cursor:not-allowed; }
+
+.download { background:#0b63d6; color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; }
+
+.comment-box { position:fixed; right:20px; bottom:20px; background:#fff; padding:12px; border-radius:8px; box-shadow:0 6px 18px rgba(3,23,52,0.08); width:320px; }
+.comment-box textarea { width:100%; height:90px; padding:8px; border-radius:6px; border:1px solid #eef6ff; }
+.comment-actions { display:flex; gap:8px; margin-top:8px; }
+
+.modal-details p { margin:8px 0; }
