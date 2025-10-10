@@ -1,0 +1,37 @@
+# Environment variables
+.env
+
+# Python virtual environment
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# IDE specific files
+.vscode/
+.idea/
+.DS_Store
+
+# Node modules (for frontend)
+node_modules/
+
+# Build directories
+build/
+dist/
+
+# Local development
+*.local
+
+# Uploads directory (if applicable)
+uploads/
