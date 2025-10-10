@@ -9,9 +9,12 @@ const AdminPage = () => {
   return (
     <div>
       {/* Navbar */}
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+      <nav className="navbar navbar-expand-lg" style={{ backgroundColor: '#0f52fc', color: 'white' }}>
         <div className="container">
-          <Link className="navbar-brand" to="/admin">Admin Dashboard</Link>
+          <Link className="navbar-brand d-flex align-items-center text-white" to="/admin">
+            <i className="bi bi-shield-lock me-2"></i>
+            <span>Admin Dashboard</span>
+          </Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -26,13 +29,22 @@ const AdminPage = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <Link className="nav-link" to="/admin">Home</Link>
+                <Link className="nav-link d-flex align-items-center text-white" to="/admin">
+                  <i className="bi bi-house-door me-1"></i>
+                  <span>Home</span>
+                </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/add-show-hods">HOD Management</Link>
+                <Link className="nav-link d-flex align-items-center text-white" to="/admin/add-show-hods">
+                  <i className="bi bi-people me-1"></i>
+                  <span>HOD Management</span>
+                </Link>
               </li>
               <li className="nav-item">
-                <Link className="nav-link" to="/admin/all-requests">All Requests</Link>
+                <Link className="nav-link d-flex align-items-center text-white" to="/admin/all-requests">
+                  <i className="bi bi-list-check me-1"></i>
+                  <span>All Requests</span>
+                </Link>
               </li>
             </ul>
           </div>

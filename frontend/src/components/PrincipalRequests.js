@@ -241,6 +241,7 @@ function PrincipalRequests() {
             Logs
           </button>
         </div>
+
         <div className="header-actions">
           <button
             className="btn btn-outline-light inline-logout-btn"
@@ -249,6 +250,7 @@ function PrincipalRequests() {
             Logout
           </button>
         </div>
+
       </header>
 
       <main className="princ-main">
