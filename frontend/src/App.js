@@ -52,8 +52,10 @@ function App() {
     };
   }, []);
 
-  return (
-    <Router>
+  // We need to use location/navigation hooks which must be inside Router
+  // Create an inner component to render routes and the logout button
+  function AppRoutes() {
+    return (
       <Routes>
         <Route path="/" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
@@ -64,6 +66,12 @@ function App() {
         <Route path="/security" element={<Security />} />
         <Route path="/principal-home" element={<PrincipalRequests />} />
       </Routes>
+    );
+  }
+
+  return (
+    <Router>
+      <AppRoutes />
     </Router>
   );
 }
