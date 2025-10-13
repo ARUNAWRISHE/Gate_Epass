@@ -3,7 +3,7 @@ import { Link, Routes, Route } from "react-router-dom";
 import AdminHome from "./Adminhome"; // Dashboard/Home component
 import AddHodAndShowHodsPage from "./AddHodAndShowHodsPage"; // HOD Management
 import AdminLog from "./Adminlog";
-
+import AdminPassReset from "./Adminpassreset"; // Assuming this is your new component
 
 const AdminPage = () => {
   return (
@@ -46,6 +46,14 @@ const AdminPage = () => {
                   <span>All Requests</span>
                 </Link>
               </li>
+              {/* NEW: Password Reset Button */}
+              <li className="nav-item">
+                <Link className="nav-link d-flex align-items-center text-white" to="/admin/password-reset">
+                  <i className="bi bi-key me-1"></i>
+                  <span>Password Reset</span>
+                </Link>
+              </li>
+              {/* END NEW */}
             </ul>
           </div>
 
@@ -62,6 +70,9 @@ const AdminPage = () => {
           <Route path="/" element={<AdminHome />} /> {/* Default Home */}
           <Route path="/add-show-hods" element={<AddHodAndShowHodsPage />} />
           <Route path="/all-requests" element={<AdminLog/>} />
+          {/* NEW: Password Reset Route */}
+          <Route path="/password-reset" element={<AdminPassReset />} />
+          {/* END NEW */}
         </Routes>
       </main>
     </div>
