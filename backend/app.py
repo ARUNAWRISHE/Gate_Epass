@@ -216,8 +216,22 @@ def create_hod_request():
 
         # Generate unique request ID
         department_prefix = re.sub(r'[^a-zA-Z]', '', department)[:2].upper()
-        last_request = Request.query.filter(Request.department == department).order_by(Request.id.desc()).first()
-        last_number = int(str(last_request.id)[2:]) if last_request and len(str(last_request.id)) > 2 else 0
+        # Find the highest numeric ID for this department
+        last_requests = Request.query.filter(
+            Request.department == department,
+            Request.id.regexp_match(f'^{department_prefix}\\d+$')
+        ).order_by(
+            db.func.cast(db.func.substr(Request.id, 3), db.Integer).desc()
+        ).all()
+        
+        if last_requests and last_requests[0].id.startswith(department_prefix):
+            try:
+                last_number = int(last_requests[0].id[len(department_prefix):])
+            except (ValueError, IndexError):
+                last_number = 0
+        else:
+            last_number = 0
+            
         new_id = f"{department_prefix}{last_number + 1}"
 
         # Create a new request entry
