@@ -198,7 +198,7 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5000/create-hod-request",
+        "http://127.0.0.1:5001/create-hod-request",
         formPayload,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -217,8 +217,8 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
         // Assuming the backend handles saving accompany persons after request creation
         // Note: The original logic here was a separate POST request, which is preserved.
         await axios.post(
-          "http://127.0.0.1:5000/add-accompany-persons",
-          { requestId: response.data.requestId, accompanyPersons },
+          "http://127.0.0.1:5001/add-accompany-persons",
+          { requestId: response.data.request_id, accompanyPersons },
           { headers: { "Content-Type": "application/json" } }
         );
       }

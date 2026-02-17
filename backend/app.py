@@ -6,8 +6,14 @@ from flask import Flask, Response, request, jsonify, send_from_directory, sessio
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 import smtplib
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+from functools import wraps
+import jwt
+
+load_dotenv()  # Load environment variables from .env file
 
 
 from email.mime.multipart import MIMEMultipart
@@ -20,13 +26,101 @@ import qrcode
 app = Flask(__name__)
 CORS(app)
 
+# 🔐 JWT Configuration
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
+app.config['JWT_SECRET_KEY'] = app.config['SECRET_KEY']
+app.config['JWT_ALGORITHM'] = 'HS256'
+app.config['JWT_EXPIRATION_HOURS'] = 24
+
 # Database Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mysql.db'  # SQLite DB
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
 db = SQLAlchemy(app)
-migrate = Migrate(app, db) 
+migrate = Migrate(app, db)
+
+# ============================================
+# 🔐 AUTHENTICATION HELPER FUNCTIONS
+# ============================================
+
+def generate_token(user_data):
+    """Generate JWT token for authenticated user"""
+    payload = {
+        'user_id': user_data.get('id'),
+        'role': user_data.get('role'),
+        'name': user_data.get('name'),
+        'exp': datetime.utcnow() + timedelta(hours=app.config['JWT_EXPIRATION_HOURS'])
+    }
+    token = jwt.encode(payload, app.config['SECRET_KEY'], algorithm='HS256')
+    return token
+
+def verify_token(token):
+    """Verify JWT token and return decoded data"""
+    try:
+        decoded = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return decoded
+    except jwt.ExpiredSignatureError:
+        return None  # Token expired
+    except jwt.InvalidTokenError:
+        return None  # Invalid token
+
+def token_required(f):
+    """Decorator to protect routes that require authentication"""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        
+        # Check for token in Authorization header
+        if 'Authorization' in request.headers:
+            auth_header = request.headers['Authorization']
+            try:
+                token = auth_header.split(" ")[1]  # Bearer <token>
+            except IndexError:
+                return jsonify({"error": "Invalid token format"}), 401
+        
+        if not token:
+            return jsonify({"error": "Token is missing"}), 401
+        
+        user_data = verify_token(token)
+        if not user_data:
+            return jsonify({"error": "Invalid or expired token"}), 401
+        
+        request.user_data = user_data  # Attach user data to request
+        return f(*args, **kwargs)
+    
+    return decorated
+
+def role_required(allowed_roles):
+    """Decorator to check if user has required role"""
+    def decorator(f):
+        @wraps(f)
+        def decorated(*args, **kwargs):
+            token = None
+            
+            # Check for token in Authorization header
+            if 'Authorization' in request.headers:
+                auth_header = request.headers['Authorization']
+                try:
+                    token = auth_header.split(" ")[1]
+                except IndexError:
+                    return jsonify({"error": "Invalid token format"}), 401
+            
+            if not token:
+                return jsonify({"error": "Token is missing"}), 401
+            
+            user_data = verify_token(token)
+            if not user_data:
+                return jsonify({"error": "Invalid or expired token"}), 401
+            
+            if user_data['role'] not in allowed_roles:
+                return jsonify({"error": "Insufficient permissions"}), 403
+            
+            request.user_data = user_data
+            return f(*args, **kwargs)
+        
+        return decorated
+    return decorator 
 
     
 class HOD(db.Model):
@@ -100,7 +194,6 @@ def get_hods():
             "name": hod.name,
             "email": hod.email,
             "department": hod.department,
-            "password": hod.password,
         } for hod in hods]), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -109,11 +202,12 @@ def get_hods():
 def create_hod():
     data = request.get_json()
     try:
+        hashed_password = generate_password_hash(data["password"])
         new_hod = HOD(
             name=data["name"],
             email=data["email"],
             department=data["department"],
-            password=data["password"]
+            password=hashed_password
         )
         db.session.add(new_hod)
         db.session.commit()
@@ -143,19 +237,25 @@ def login():
     password = data['password']
 
     if role == 'hod':
-        hod = HOD.query.filter_by(department=data['department'], password=password).first()
-        if hod:
-            return jsonify({"message": "Login successful", "user": {"id": hod.id, "name": hod.name, "department": hod.department}})
+        hod = HOD.query.filter_by(department=data['department']).first()
+        if hod and check_password_hash(hod.password, password):
+            user_data = {"id": hod.id, "name": hod.name, "department": hod.department, "role": "hod"}
+            token = generate_token(user_data)
+            return jsonify({"message": "Login successful", "user": user_data, "token": token})
         else:
             return jsonify({"error": "Invalid HOD credentials"}), 401
     elif role == 'ao':
         if data['role'] == 'ao' and password == '123':
-            return jsonify({"message": "Login successful", "user": {"role": "AO"}})
+            user_data = {"id": 1, "name": "AO", "role": "ao"}
+            token = generate_token(user_data)
+            return jsonify({"message": "Login successful", "user": user_data, "token": token})
         else:
             return jsonify({"error": "Invalid AO credentials"}), 401
     elif role in ['principal', 'director', 'admin','security']:
         if password == "123":
-            return jsonify({"message": f"{role.capitalize()} login successful", "user": {"role": role}})
+            user_data = {"id": 1, "name": role.capitalize(), "role": role}
+            token = generate_token(user_data)
+            return jsonify({"message": f"{role.capitalize()} login successful", "user": user_data, "token": token})
         else:
             return jsonify({"error": f"Invalid {role.capitalize()} credentials"}), 401
     else:
@@ -175,7 +275,7 @@ def forgot_password():
     if not new_password:
         return jsonify({"success": True, "message": "Email verified. Enter a new password."})
 
-    hod.password = new_password  # Ideally, hash this before saving
+    hod.password = generate_password_hash(new_password)
     db.session.commit()
 
     return jsonify({"success": True, "message": "Password updated successfully!"})
@@ -214,11 +314,31 @@ def create_hod_request():
         # Fetch department from the form
         department = HOD.query.get(request.form.get('hod_id')).department
 
-        # Generate unique request ID
+        # Generate unique request ID with better logic
         department_prefix = re.sub(r'[^a-zA-Z]', '', department)[:2].upper()
-        last_request = Request.query.filter(Request.department == department).order_by(Request.id.desc()).first()
-        last_number = int(str(last_request.id)[2:]) if last_request and len(str(last_request.id)) > 2 else 0
-        new_id = f"{department_prefix}{last_number + 1}"
+        
+        # Get all request IDs for this department and extract numbers
+        all_requests = Request.query.filter(Request.department == department).all()
+        existing_numbers = []
+        
+        for req in all_requests:
+            try:
+                # Extract numeric part after the prefix
+                if req.id.startswith(department_prefix):
+                    num_str = req.id[len(department_prefix):]
+                    if num_str.isdigit():
+                        existing_numbers.append(int(num_str))
+            except:
+                pass
+        
+        # Find the next available number
+        next_number = max(existing_numbers) + 1 if existing_numbers else 1
+        
+        # Ensure uniqueness by checking if ID exists
+        new_id = f"{department_prefix}{next_number}"
+        while Request.query.get(new_id):
+            next_number += 1
+            new_id = f"{department_prefix}{next_number}"
 
         # Create a new request entry
         new_request = Request(
@@ -265,13 +385,29 @@ def get_department():
 def create_ao_request():
     try:
         data = request.form
-        last_request = Request.query.filter(Request.id.startswith("AO")).order_by(Request.id.desc()).first()
-        if last_request and last_request.id[2:].isdigit():
-            last_id_num = int(last_request.id[2:])
-            new_id = f"AO{last_id_num + 1}"
-        else:
-            new_id = "AO1"
-            new_request = Request(
+        
+        # Generate unique AO request ID
+        all_ao_requests = Request.query.filter(Request.id.startswith("AO")).all()
+        existing_numbers = []
+        
+        for req in all_ao_requests:
+            try:
+                num_str = req.id[2:]  # Extract after "AO"
+                if num_str.isdigit():
+                    existing_numbers.append(int(num_str))
+            except:
+                pass
+        
+        # Find the next available number
+        next_number = max(existing_numbers) + 1 if existing_numbers else 1
+        
+        # Ensure uniqueness by checking if ID exists
+        new_id = f"AO{next_number}"
+        while Request.query.get(new_id):
+            next_number += 1
+            new_id = f"AO{next_number}"
+        
+        new_request = Request(
             id=new_id,
             name='AO',  
             department='AO Request', 
@@ -289,6 +425,7 @@ def create_ao_request():
             status = "Approved"
         )
         
+        db.session.add(new_request)
 
         # Handle Accompany Persons
         if 'accompanyPersons' in data:
@@ -547,8 +684,13 @@ def generate_qr_code(otp, filename):
 # Function to send OTP email
 def send_otp_email(email, otp, qr_path):
     try:
-        sender_email = "infotechcheb@gmail.com"
-        sender_password = "wzxk axwa iifa iplk"
+        sender_email = os.getenv('MAIL_USERNAME', 'infotechcheb@gmail.com')
+        sender_password = os.getenv('MAIL_PASSWORD')
+        
+        if not sender_password:
+            print("Error: MAIL_PASSWORD not found in environment variables")
+            return
+            
         subject = "Your Event Pass QR Code – KGISL Institute of Technology"
         body = """Respected Sir/Madam,
 
@@ -653,7 +795,8 @@ def update_hod(hod_id):
         hod.name = data.get("name", hod.name)
         hod.email = data.get("email", hod.email)
         hod.department = data.get("department", hod.department)
-        hod.password = data.get("password", hod.password)
+        if "password" in data:
+            hod.password = generate_password_hash(data["password"])
 
         db.session.commit()
         return jsonify({"message": "HOD updated successfully!"}), 200
@@ -689,8 +832,12 @@ def find_latest_appreciation_letter(event_name):
 
 def send_thankyou_email(email, event_name):
     try:
-        sender_email = "infotechcheb@gmail.com"  # Replace with your email
-        sender_password = "wzxk axwa iifa iplk"   # Replace with your app password
+        sender_email = os.getenv('MAIL_USERNAME', 'infotechcheb@gmail.com')
+        sender_password = os.getenv('MAIL_PASSWORD')
+        
+        if not sender_password:
+            print("Error: MAIL_PASSWORD not found in environment variables")
+            return
 
         # Find the latest appreciation letter for the event
         file_path = find_latest_appreciation_letter(event_name)
@@ -742,7 +889,7 @@ def verify_otp():
             return jsonify({"success": False, "message": "OTP not found"}), 404
 
         # Construct the guest image URL
-        guest_image_url = f"http://127.0.0.1:5000/uploads/{request_obj.image}" if request_obj.image else None
+        guest_image_url = f"http://127.0.0.1:5001/uploads/{request_obj.image}" if request_obj.image else None
 
         return jsonify({
             "success": True,
@@ -825,4 +972,4 @@ if __name__ == '__main__':
         os.makedirs('uploads')
     with app.app_context():
         db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5001)

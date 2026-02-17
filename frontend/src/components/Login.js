@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { FaLock, FaBuilding, FaEye, FaEyeSlash } from "react-icons/fa";
 import "react-toastify/dist/ReactToastify.css";
 
-function Login() {
+function Login({ setUser }) {
   const [role, setRole] = useState("hod");
   const [password, setPassword] = useState("");
   const [department, setDepartment] = useState("");
@@ -30,6 +30,10 @@ function Login() {
       const response = await loginUser(loginData);
       toast.success(`Welcome, ${role.toUpperCase()}!`, { autoClose: 1000 });
 
+      // 🔒 Store token and user data in localStorage
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
       setTimeout(() => {
         setLoading(false);
         const routes = {
@@ -40,6 +44,8 @@ function Login() {
           admin: "/admin",
           security: "/security",
         };
+        // Update parent component with user data
+        setUser(response.data.user);
         navigate(routes[role], { state: { user: response.data.user } });
       }, 2000);
     } catch (error) {

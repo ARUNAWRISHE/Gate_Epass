@@ -41,7 +41,7 @@ function PrincipalRequests() {
         status = "Principal Approved";
       }
 
-      const response = await axios.get("http://127.0.0.1:5000/all-requests", {
+      const response = await axios.get("http://127.0.0.1:5001/all-requests", {
         params: { status },
       });
 
@@ -69,7 +69,7 @@ function PrincipalRequests() {
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {
-      window.open(`http://127.0.0.1:5000/uploads/${letterPath}`, "_blank");
+      window.open(`http://127.0.0.1:5001/uploads/${letterPath}`, "_blank");
     } else {
       alert("No approval letter available.");
     }
@@ -104,7 +104,7 @@ function PrincipalRequests() {
         },
       });
 
-      const response = await axios.put(`http://127.0.0.1:5000/principal-requests/${id}`, { status });
+      const response = await axios.put(`http://127.0.0.1:5001/principal-requests/${id}`, { status });
 
       if (response.status === 200) {
         Swal.fire({
@@ -132,7 +132,7 @@ function PrincipalRequests() {
     }
 
     try {
-      const response = await axios.put(`http://127.0.0.1:5000/principal-requests/${selectedRequestId}`, {
+      const response = await axios.put(`http://127.0.0.1:5001/principal-requests/${selectedRequestId}`, {
         status: "Remarks by Principal",
         remarks: comment,
       });

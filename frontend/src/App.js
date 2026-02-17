@@ -9,9 +9,23 @@ import AdminPage from "./components/AdminPage";
 import HodHome from "./components/HodHome";
 import Security from "./components/Security";
 import PrincipalRequests from "./components/PrincipalRequests";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Unauthorized from "./components/Unauthorized";
 
 function App() {
   const [user, setUser] = useState(null); // Handle user state (staff details)
+
+  // 🔒 Restore user session from localStorage on app load
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (error) {
+        console.error("Failed to restore user session:", error);
+      }
+    }
+  }, []);
 
   // 🔒 Advanced Inspect Element Blocking
   useEffect(() => {
@@ -57,14 +71,18 @@ function App() {
   function AppRoutes() {
     return (
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Login setUser={setUser} />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/home" element={<StaffHome user={user} />} />
-        <Route path="/all-requests" element={<AllRequests user={user} />} />
-        <Route path="/admin/*" element={<AdminPage />} />
-        <Route path="/hod-home" element={<HodHome />} />
-        <Route path="/security" element={<Security />} />
-        <Route path="/principal-home" element={<PrincipalRequests />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
+        
+        {/* Protected Routes - Only accessible with authentication */}
+        <Route path="/home" element={<ProtectedRoute element={<StaffHome user={user} />} user={user} />} />
+        <Route path="/all-requests" element={<ProtectedRoute element={<AllRequests user={user} />} user={user} allowedRoles={["ao"]} />} />
+        <Route path="/admin/*" element={<ProtectedRoute element={<AdminPage />} user={user} allowedRoles={["admin"]} />} />
+        <Route path="/hod-home" element={<ProtectedRoute element={<HodHome />} user={user} allowedRoles={["hod"]} />} />
+        <Route path="/security" element={<ProtectedRoute element={<Security />} user={user} allowedRoles={["security"]} />} />
+        <Route path="/principal-home" element={<ProtectedRoute element={<PrincipalRequests />} user={user} allowedRoles={["principal", "director"]} />} />
       </Routes>
     );
   }
