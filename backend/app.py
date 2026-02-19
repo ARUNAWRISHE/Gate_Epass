@@ -25,14 +25,16 @@ import qrcode
 
 app = Flask(__name__)
 
-# 🔐 CORS Configuration - Allow Vercel Frontend
+# 🔐 CORS Configuration - Allow Frontend (from environment variables)
+allowed_origins = [
+    os.getenv('FRONTEND_URL', 'http://localhost:3000'),
+    os.getenv('FRONTEND_URL_ALT', 'http://127.0.0.1:3000'),
+    'https://gatepass-rho.vercel.app',  # Production frontend
+]
+
 CORS(app, resources={
     r"/*": {
-        "origins": [
-            "https://gatepass-rho.vercel.app",
-            "http://localhost:3000",
-            "http://127.0.0.1:3000"
-        ],
+        "origins": allowed_origins,
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
@@ -901,8 +903,9 @@ def verify_otp():
         if not request_obj:
             return jsonify({"success": False, "message": "OTP not found"}), 404
 
-        # Construct the guest image URL
-        guest_image_url = f"http://127.0.0.1:5001/uploads/{request_obj.image}" if request_obj.image else None
+        # Construct the guest image URL - Use deployed backend URL
+        backend_url = os.getenv('BACKEND_URL', 'https://gate-epass-w82j.onrender.com')
+        guest_image_url = f"{backend_url}/uploads/{request_obj.image}" if request_obj.image else None
 
         return jsonify({
             "success": True,
