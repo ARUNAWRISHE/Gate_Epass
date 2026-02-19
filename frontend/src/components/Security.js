@@ -93,7 +93,7 @@ const QRScanner = () => {
         });
     
         try {
-            const response = await axios.post('http://localhost:5000/verify-otp', { otp });
+            const response = await axios.post('http://localhost:5001/verify-otp', { otp });
     
             Swal.close(); // Close loading alert
     
@@ -162,7 +162,7 @@ const QRScanner = () => {
                     });
     
                     if (isConfirmed) {
-                        await axios.post('http://localhost:5000/update-time', { otp, action: 'arrived' });
+                        await axios.post('http://localhost:5001/update-time', { otp, action: 'arrived' });
                         Swal.fire('Success!', 'In-time updated successfully!', 'success');
                     }
                 }
@@ -186,7 +186,7 @@ const QRScanner = () => {
                                 Swal.showLoading();
                             },
                         });
-                        await axios.post('http://localhost:5000/update-time', { otp, action: 'left' });
+                        await axios.post('http://localhost:5001/update-time', { otp, action: 'left' });
                         Swal.close();
                         Swal.fire('Success!', 'Out-time updated successfully!', 'success');
                     }
@@ -201,7 +201,7 @@ const QRScanner = () => {
     const fetchActiveRequests = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/active-requests');
+            const response = await axios.get('http://localhost:5001/active-requests');
             setActiveRequests(response.data);
         } catch (error) {
             console.error("Error fetching active requests:", error);

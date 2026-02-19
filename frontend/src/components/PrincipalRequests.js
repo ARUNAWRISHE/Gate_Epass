@@ -165,7 +165,7 @@ function PrincipalRequests() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/departments");
+      const response = await axios.get("http://127.0.0.1:5001/api/departments");
       setDepartments(response.data);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
