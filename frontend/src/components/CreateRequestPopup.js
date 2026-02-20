@@ -207,11 +207,14 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
 
       setSuccessMessage("Request Created Successfully!");
       setTimeout(() => {
-        // Only reload if the popup is still open after a delay
-        if (isOpen) window.location.reload();
+        // Close the popup instead of reloading the page
+        if (isOpen) {
+          onClose(); // Close the popup
+          // Refresh the requests list without losing login
+          if (onSubmit) onSubmit(response.data);
+        }
       }, 1000);
       alert("Request Created Successfully!");
-      onSubmit(response.data);
 
       if (accompanyPersons.length > 0) {
         // Assuming the backend handles saving accompany persons after request creation

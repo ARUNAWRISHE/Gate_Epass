@@ -46,7 +46,7 @@ const [selectedRequestId, setSelectedRequestId] = useState(null);
         status = "Accepted";
       }
   
-      const response = await axios.get("http://127.0.0.1:5000/all-requests", {
+      const response = await axios.get("http://127.0.0.1:5001/all-requests", {
         params: { status },
       });
   
@@ -74,7 +74,7 @@ const [selectedRequestId, setSelectedRequestId] = useState(null);
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {
-      window.open(`http://127.0.0.1:5000/uploads/${letterPath}`, "_blank");
+      window.open(`http://127.0.0.1:5001/uploads/${letterPath}`, "_blank");
     } else {
       alert("No approval letter available.");
     }
@@ -108,7 +108,7 @@ const [selectedRequestId, setSelectedRequestId] = useState(null);
             },
         });
 
-        const response = await axios.put(`http://127.0.0.1:5000/requests/${id}`, { status });
+        const response = await axios.put(`http://127.0.0.1:5001/requests/${id}`, { status });
 
         if (response.status === 200) {
             Swal.fire({
@@ -137,7 +137,7 @@ const submitRemarks = async (id) => {
     }
 
     try {
-        const response = await axios.put(`http://127.0.0.1:5000/requests/${id}/remarks`, { remarks: comment });
+        const response = await axios.put(`http://127.0.0.1:5001/requests/${id}/remarks`, { remarks: comment });
 
         if (response.status === 200) {
             alert("Remarks submitted successfully!");
@@ -159,7 +159,7 @@ const submitRemarks = async (id) => {
     }
   
     try {
-      const response = await axios.put(`http://127.0.0.1:5000/requests/${selectedRequestId}`, {
+      const response = await axios.put(`http://127.0.0.1:5001/requests/${selectedRequestId}`, {
         status: "Give Remarks",
         comment: comment,
       });
@@ -185,7 +185,7 @@ const submitRemarks = async (id) => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/departments");
+      const response = await axios.get("http://127.0.0.1:5001/api/departments");
       setDepartments(response.data);
     } catch (err) {
       console.error("Failed to fetch departments:", err);

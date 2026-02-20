@@ -26,7 +26,7 @@ function AdminLog() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get("http://127.0.0.1:5000/all-requests", {
+      const response = await axios.get("http://127.0.0.1:5001/all-requests", {
         params: { status: "Past" },
       });
 
@@ -46,7 +46,7 @@ function AdminLog() {
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {
-      window.open(`http://127.0.0.1:5000/uploads/${letterPath}`, "_blank");
+      window.open(`http://127.0.0.1:5001/uploads/${letterPath}`, "_blank");
     } else {
       alert("No approval letter available.");
     }
@@ -59,7 +59,7 @@ function AdminLog() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5000/api/departments");
+      const response = await axios.get("http://127.0.0.1:5001/api/departments");
       setDepartments(response.data);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
