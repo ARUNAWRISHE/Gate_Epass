@@ -100,7 +100,9 @@ function Login({ setUser }) {
               <option value="hod">HOD</option>
               <option value="ao">AO</option>
               <option value="principal">Principal</option>
+              <option value="director">Director</option>
               <option value="admin">Admin</option>
+              <option value="security">Security</option>
             </select>
           </div>
 

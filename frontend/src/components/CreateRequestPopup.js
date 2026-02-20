@@ -206,6 +206,10 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
       );
 
       setSuccessMessage("Request Created Successfully!");
+      setTimeout(() => {
+        // Only reload if the popup is still open after a delay
+        if (isOpen) window.location.reload();
+      }, 1000);
       alert("Request Created Successfully!");
       onSubmit(response.data);
 

@@ -73,7 +73,7 @@ const CreateAORequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
     });
   
     try {
-      const response = await axios.post("http://127.0.0.1:5001/create-ao-request", form, {
+      const response = await axios.post("http://127.0.0.1:5000/create-ao-request", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   

@@ -21,7 +21,7 @@ const AddHodAndShowHodsPage = () => {
   useEffect(() => {
     const fetchHods = async () => {
       try {
-        const response = await axios.get("http://localhost:5001/api/hods");
+        const response = await axios.get("http://localhost:5000/api/hods");
         setHods(response.data);
       } catch (error) {
         console.error("Error fetching HODs:", error);
@@ -43,9 +43,9 @@ const AddHodAndShowHodsPage = () => {
     e.preventDefault();
     try {
       if (editingHod) {
-        await axios.put(`http://localhost:5001/api/update-hod/${editingHod.id}`, hodData);
+        await axios.put(`http://localhost:5000/api/update-hod/${editingHod.id}`, hodData);
       } else {
-        await axios.post("http://localhost:5001/api/create-hod", hodData);
+        await axios.post("http://localhost:5000/api/create-hod", hodData);
       }
 
       alert(`HOD ${editingHod ? "Updated" : "Added"} Successfully`);
@@ -70,7 +70,7 @@ const AddHodAndShowHodsPage = () => {
   const handleDeleteHod = async (hodId) => {
     if (window.confirm("Are you sure you want to delete this HOD?")) {
       try {
-        await axios.delete(`http://localhost:5001/api/delete-hod/${hodId}`);
+        await axios.delete(`http://localhost:5000/api/delete-hod/${hodId}`);
         alert("HOD Deleted Successfully");
       } catch (error) {
         alert("Error deleting HOD");
