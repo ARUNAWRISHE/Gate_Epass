@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { CSVLink } from "react-csv";
 import Modal from "react-bootstrap/Modal";
@@ -23,17 +23,12 @@ function Requests() {
   const [comment, setComment] = useState(""); 
 const [showCommentBox, setShowCommentBox] = useState(false);
 const [recreateRequestId, setRecreateRequestId] = useState(null);
-const [selectedRequestId, setSelectedRequestId] = useState(null);
+const [selectedRequestId] = useState(null);
 
   // States for the popup modal
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  useEffect(() => {
-    fetchRequests();
-    fetchDepartments();
-  }, [selectedTab]);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -70,7 +65,12 @@ const [selectedRequestId, setSelectedRequestId] = useState(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTab]);
+
+  useEffect(() => {
+    fetchRequests();
+    fetchDepartments();
+  }, [selectedTab, fetchRequests]);
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { fetchRequests, createRequest } from "../api";
 import CreateRequestPopup from "./CreateRequestPopup";
-import { Box, Button } from "@mui/material";
+import { Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import { CSVLink } from "react-csv";
 import "./PrincipalRequests.css";
@@ -12,7 +12,6 @@ function HodHome() {
   const user = location.state?.user || {};
   const [requests, setRequests] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedTab, setSelectedTab] = useState("pending");
   const [search, setSearch] = useState("");
@@ -20,7 +19,7 @@ function HodHome() {
 
   // Pagination (page is zero-based)
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage] = useState(10);
 
   // Fetch Requests (useCallback to prevent unnecessary re-renders)
   const loadRequests = useCallback(async () => {
@@ -80,26 +79,18 @@ function HodHome() {
 
   // Handle New Request Submission
   const handleNewRequest = async (formData) => {
-    setIsSubmitting(true);
     try {
       const response = await createRequest({ ...formData, hod_id: user.id });
       setRequests((prevRequests) => [...prevRequests, response.data]);
       setShowPopup(false);
     } catch (error) {
       console.error("Error creating request:", error.response || error.message);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   // Handle Pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); // Reset to first page
   };
 
   // Status field (Styled Badges)
@@ -211,65 +202,5 @@ function HodHome() {
     </div>
   );
 }
-
-// *Styled Components*
-const styles = {
-  container: {
-    marginTop: 5,
-    padding: 3,
-    backgroundColor: "#ffffff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    borderBottom: "3px solid #004080",
-    paddingBottom: "10px",
-    marginBottom: "20px",
-  },
-  userName: {
-    fontWeight: "bold",
-    color: "#004080",
-  },
-  createBtn: {
-    backgroundColor: "#004080",
-    "&:hover": {
-      backgroundColor: "#003366",
-    },
-    padding: "10px 20px",
-    borderRadius: "8px",
-    fontWeight: "bold",
-    textTransform: "none",
-  },
-  tableContainer: {
-    marginTop: "20px",
-    borderRadius: "10px",
-    overflow: "hidden",
-  },
-  th: {
-    backgroundColor: "#004080",
-    color: "white",
-    fontWeight: "bold",
-    textAlign: "left",
-  },
-  row: {
-    transition: "0.3s",
-    "&:hover": {
-      backgroundColor: "#f8f9fa",
-    },
-  },
-  loadingContainer: {
-    textAlign: "center",
-    padding: "20px",
-  },
-  noData: {
-    textAlign: "center",
-    fontStyle: "italic",
-    color: "gray",
-    padding: "20px",
-  },
-};
 
 export default HodHome;

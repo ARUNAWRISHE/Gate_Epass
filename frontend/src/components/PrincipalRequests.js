@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { CSVLink } from "react-csv";
 import Modal from "react-bootstrap/Modal";
@@ -23,12 +23,7 @@ function PrincipalRequests() {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
-  useEffect(() => {
-    fetchRequests();
-    fetchDepartments();
-  }, [selectedTab]);
-
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
@@ -65,7 +60,12 @@ function PrincipalRequests() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedTab]);
+
+  useEffect(() => {
+    fetchRequests();
+    fetchDepartments();
+  }, [selectedTab, fetchRequests]);
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {

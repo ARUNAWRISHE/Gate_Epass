@@ -5,7 +5,6 @@ import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
 
 const QRScanner = () => {
-    const [otp, setOtp] = useState('');
     const [showScanner, setShowScanner] = useState(false);
     const [activeRequests, setActiveRequests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -20,6 +19,7 @@ const QRScanner = () => {
         } else {
             stopCamera();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showScanner]);
 
     useEffect(() => {
@@ -74,7 +74,6 @@ const QRScanner = () => {
             const code = jsQR(imageData.data, imageData.width, imageData.height);
 
             if (code) {
-                setOtp(code.data);
                 verifyOTP(code.data);
                 stopCamera(); // Stop the camera after successfully scanning
                 setShowScanner(false); // Hide the scanner

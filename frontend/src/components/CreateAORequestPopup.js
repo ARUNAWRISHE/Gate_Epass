@@ -20,7 +20,6 @@ const CreateAORequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
   });
 
   const [accompanyPersons, setAccompanyPersons] = useState([]);
-  const [showAccompanyFields, setShowAccompanyFields] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
