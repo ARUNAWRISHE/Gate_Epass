@@ -63,8 +63,8 @@ function Login({ setUser }) {
     >
       <ToastContainer position="top-right" autoClose={3000} />
 
-      {/* College Header with Logo */}
-      <header className="text-center mb-3">
+      {/* College Header with Logo - COMMENTED OUT */}
+      {/* <header className="text-center mb-3">
         <a href="https://www.kgkite.ac.in/" target="_blank" rel="noopener noreferrer">
           <img
             src={require("./logo.webp")}
@@ -75,7 +75,7 @@ function Login({ setUser }) {
         </a>
         <h2 className="text-primary fw-bold">KGISL</h2>
         <p className="text-secondary">Empowering Innovation & Excellence</p>
-      </header>
+      </header> */}
 
       <div
         className="card shadow-lg p-4 rounded"

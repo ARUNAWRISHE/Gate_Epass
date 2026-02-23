@@ -43,6 +43,7 @@
   },
   "scripts": {
     "start": "concurrently \"npm run client\" \"npm run server\"",
+    "dev": "react-scripts start",
     "client": "react-scripts start",
     "server": "cd ../backend && python app.py",
     "build": "react-scripts build",
