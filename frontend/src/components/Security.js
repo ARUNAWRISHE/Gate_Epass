@@ -31,6 +31,13 @@ const QRScanner = () => {
 
     useEffect(() => {
         fetchActiveRequests();
+
+        // Auto-refresh every 30 seconds
+        const interval = setInterval(() => {
+            fetchActiveRequests();
+        }, 30000);
+
+        return () => clearInterval(interval);
     }, []);
 
     const startCamera = async () => {
@@ -226,6 +233,13 @@ const QRScanner = () => {
                         <span>Security Dashboard</span>
                     </Link>
                     <div className="header-actions ms-auto">
+                        <button 
+                            className="btn btn-outline-light me-2" 
+                            onClick={fetchActiveRequests}
+                            title="Refresh requests"
+                        >
+                            🔄 Refresh
+                        </button>
                         <button 
                             className="btn btn-outline-light inline-logout-btn" 
                             onClick={handleLogout}

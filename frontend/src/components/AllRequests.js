@@ -71,6 +71,13 @@ const [selectedRequestId] = useState(null);
   useEffect(() => {
     fetchRequests();
     fetchDepartments();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [selectedTab, fetchRequests]);
 
   const handleViewLetter = (letterPath) => {
@@ -258,6 +265,9 @@ const submitRemarks = async (id) => {
           <button className={`tab ${selectedTab === "past" ? "active" : ""}`} onClick={() => setSelectedTab("past")}>Logs</button>
         </div>
         <div className="header-actions">
+          <button className="btn btn-outline-light" onClick={fetchRequests} title="Refresh requests">
+            🔄 Refresh
+          </button>
           <button
             className="btn btn-outline-light inline-logout-btn"
             onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}

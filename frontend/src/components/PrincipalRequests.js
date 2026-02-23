@@ -66,6 +66,13 @@ function PrincipalRequests() {
   useEffect(() => {
     fetchRequests();
     fetchDepartments();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [selectedTab, fetchRequests]);
 
   const handleViewLetter = (letterPath) => {
@@ -244,6 +251,9 @@ function PrincipalRequests() {
         </div>
 
         <div className="header-actions">
+          <button className="btn btn-outline-light" onClick={fetchRequests} title="Refresh requests">
+            🔄 Refresh
+          </button>
           <button
             className="btn btn-outline-light inline-logout-btn"
             onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}

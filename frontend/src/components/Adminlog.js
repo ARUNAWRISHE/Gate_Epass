@@ -21,6 +21,13 @@ function AdminLog() {
   useEffect(() => {
     fetchRequests();
     fetchDepartments();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchRequests();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const fetchRequests = async () => {
@@ -114,7 +121,12 @@ function AdminLog() {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Admin Logs</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="mb-0">Admin Logs</h2>
+        <button className="btn btn-primary" onClick={fetchRequests} title="Refresh requests">
+          🔄 Refresh
+        </button>
+      </div>
       <div className="d-flex justify-content-between mb-3">
         <div className="col-md-6">
           <select

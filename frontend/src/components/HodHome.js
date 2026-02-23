@@ -43,6 +43,13 @@ function HodHome() {
 
   useEffect(() => {
     loadRequests();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadRequests();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, [loadRequests]);
 
   // Departments list can be derived from requests or fetched separately; derive here
@@ -138,6 +145,9 @@ function HodHome() {
         <div className="header-actions">
           <button className="btn btn-outline-light" onClick={() => setShowPopup(true)}>
             <AddIcon sx={{ mr: 1 }} /> Create Request
+          </button>
+          <button className="btn btn-outline-light" onClick={loadRequests} title="Refresh requests">
+            🔄 Refresh
           </button>
           <button className="btn btn-outline-light inline-logout-btn" onClick={() => { localStorage.clear(); sessionStorage.clear(); window.location.href = '/'; }}>
             Logout

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { fetchRequests, createRequest } from "../api";
 import CreateRequestPopup from "./CreateRequestPopup";
@@ -11,22 +11,26 @@ function StaffHome() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load requests for the logged-in staff
-  useEffect(() => {
-    const loadRequests = async () => {
-      try {
-        console.log(`Fetching requests for staff ID: ${user.id}`); // Debug log
-        const response = await fetchRequests(user.id);
-        console.log("Requests received:", response.data); // Debug log
-        setRequests(response.data);
-      } catch (error) {
-        console.error("Error fetching requests:", error.response || error.message);
-      }
-    };
-
-    if (user.id) {
-      loadRequests();
+  const loadRequests = useCallback(async () => {
+    if (!user.id) return;
+    try {
+      const response = await fetchRequests(user.id);
+      setRequests(response.data);
+    } catch (error) {
+      console.error("Error fetching requests:", error.response || error.message);
     }
   }, [user.id]);
+
+  useEffect(() => {
+    loadRequests();
+
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      loadRequests();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [loadRequests]);
 
   // Handle new request submission
   const handleNewRequest = async (formData) => {
@@ -48,7 +52,12 @@ function StaffHome() {
 
   return (
     <div className="container mt-5">
-      <h2>Welcome, {user.name}</h2>
+      <div className="d-flex justify-content-between align-items-center">
+        <h2>Welcome, {user.name}</h2>
+        <button className="btn btn-outline-primary" onClick={loadRequests} title="Refresh requests">
+          🔄 Refresh
+        </button>
+      </div>
       {/* <h1>{user.id}</h1> */}
 
       {/* Button to show the popup */}
