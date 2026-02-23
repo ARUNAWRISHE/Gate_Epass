@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import "./CreateRequestPopup.css";
 
 // Helper function to format time (e.g., 9:05 AM)
@@ -198,7 +199,7 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
 
     try {
       const response = await axios.post(
-        "http://127.0.0.1:5001/create-hod-request",
+        `${API_BASE_URL}/create-hod-request`,
         formPayload,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -220,7 +221,7 @@ const CreateRequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
         // Assuming the backend handles saving accompany persons after request creation
         // Note: The original logic here was a separate POST request, which is preserved.
         await axios.post(
-          "http://127.0.0.1:5001/add-accompany-persons",
+          `${API_BASE_URL}/add-accompany-persons`,
           { requestId: response.data.request_id, accompanyPersons },
           { headers: { "Content-Type": "application/json" } }
         );

@@ -29,7 +29,7 @@ app = Flask(__name__)
 allowed_origins = [
     os.getenv('FRONTEND_URL', 'http://localhost:3000'),
     os.getenv('FRONTEND_URL_ALT', 'http://127.0.0.1:3000'),
-    'https://gatepass-rho.vercel.app',  # Production frontend
+    'https://gate-e-pass.vercel.app',  # Production frontend
 ]
 
 CORS(app, resources={
@@ -904,7 +904,7 @@ def verify_otp():
             return jsonify({"success": False, "message": "OTP not found"}), 404
 
         # Construct the guest image URL - Use deployed backend URL
-        backend_url = os.getenv('BACKEND_URL', 'https://gate-epass-w82j.onrender.com')
+        backend_url = os.getenv('BACKEND_URL', 'https://gate-epass-o24z.onrender.com')
         guest_image_url = f"{backend_url}/uploads/{request_obj.image}" if request_obj.image else None
 
         return jsonify({

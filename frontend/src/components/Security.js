@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from '../api';
 import jsQR from 'jsqr';
 import Swal from 'sweetalert2';
 import { Link } from 'react-router-dom';
@@ -92,7 +93,7 @@ const QRScanner = () => {
         });
     
         try {
-            const response = await axios.post('http://localhost:5000/verify-otp', { otp });
+            const response = await axios.post(`${API_BASE_URL}/verify-otp`, { otp });
     
             Swal.close(); // Close loading alert
     
@@ -161,7 +162,7 @@ const QRScanner = () => {
                     });
     
                     if (isConfirmed) {
-                        await axios.post('http://localhost:5000/update-time', { otp, action: 'arrived' });
+                        await axios.post(`${API_BASE_URL}/update-time`, { otp, action: 'arrived' });
                         Swal.fire('Success!', 'In-time updated successfully!', 'success');
                     }
                 }
@@ -185,7 +186,7 @@ const QRScanner = () => {
                                 Swal.showLoading();
                             },
                         });
-                        await axios.post('http://localhost:5000/update-time', { otp, action: 'left' });
+                        await axios.post(`${API_BASE_URL}/update-time`, { otp, action: 'left' });
                         Swal.close();
                         Swal.fire('Success!', 'Out-time updated successfully!', 'success');
                     }
@@ -200,7 +201,7 @@ const QRScanner = () => {
     const fetchActiveRequests = async () => {
         setLoading(true);
         try {
-            const response = await axios.get('http://localhost:5000/active-requests');
+            const response = await axios.get(`${API_BASE_URL}/active-requests`);
             setActiveRequests(response.data);
         } catch (error) {
             console.error("Error fetching active requests:", error);

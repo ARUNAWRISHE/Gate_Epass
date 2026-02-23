@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import Chart from "chart.js/auto";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faList, faClock, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
@@ -18,7 +19,7 @@ const AdminHome = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/stats");
+        const response = await axios.get(`${API_BASE_URL}/api/stats`);
         setStats(response.data);
       } catch (error) {
         console.error("Error fetching stats:", error);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import { Modal, Button, Form, Table } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaEye, FaEyeSlash, FaSearch, FaEdit, FaTrash } from "react-icons/fa";
@@ -21,7 +22,7 @@ const AddHodAndShowHodsPage = () => {
   useEffect(() => {
     const fetchHods = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/hods");
+        const response = await axios.get(`${API_BASE_URL}/api/hods`);
         setHods(response.data);
       } catch (error) {
         console.error("Error fetching HODs:", error);
@@ -43,9 +44,9 @@ const AddHodAndShowHodsPage = () => {
     e.preventDefault();
     try {
       if (editingHod) {
-        await axios.put(`http://localhost:5000/api/update-hod/${editingHod.id}`, hodData);
+        await axios.put(`${API_BASE_URL}/api/update-hod/${editingHod.id}`, hodData);
       } else {
-        await axios.post("http://localhost:5000/api/create-hod", hodData);
+        await axios.post(`${API_BASE_URL}/api/create-hod`, hodData);
       }
 
       alert(`HOD ${editingHod ? "Updated" : "Added"} Successfully`);
@@ -70,7 +71,7 @@ const AddHodAndShowHodsPage = () => {
   const handleDeleteHod = async (hodId) => {
     if (window.confirm("Are you sure you want to delete this HOD?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/delete-hod/${hodId}`);
+        await axios.delete(`${API_BASE_URL}/api/delete-hod/${hodId}`);
         alert("HOD Deleted Successfully");
       } catch (error) {
         alert("Error deleting HOD");

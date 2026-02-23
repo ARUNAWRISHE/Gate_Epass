@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import "./CreateaoRequestPopup.css";
 
 const CreateAORequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
@@ -72,7 +73,7 @@ const CreateAORequestPopup = ({ isOpen, onClose, onSubmit, hodId }) => {
     });
   
     try {
-      const response = await axios.post("http://127.0.0.1:5000/create-ao-request", form, {
+      const response = await axios.post(`${API_BASE_URL}/create-ao-request`, form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   

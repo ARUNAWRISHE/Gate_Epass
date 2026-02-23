@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import { CSVLink } from "react-csv";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -26,7 +27,7 @@ function AdminLog() {
     setLoading(true);
     setError("");
     try {
-      const response = await axios.get("http://127.0.0.1:5001/all-requests", {
+      const response = await axios.get(`${API_BASE_URL}/all-requests`, {
         params: { status: "Past" },
       });
 
@@ -46,7 +47,7 @@ function AdminLog() {
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {
-      window.open(`http://127.0.0.1:5001/uploads/${letterPath}`, "_blank");
+      window.open(`${API_BASE_URL}/uploads/${letterPath}`, "_blank");
     } else {
       alert("No approval letter available.");
     }
@@ -59,7 +60,7 @@ function AdminLog() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5001/api/departments");
+      const response = await axios.get(`${API_BASE_URL}/api/departments`);
       setDepartments(response.data);
     } catch (err) {
       console.error("Failed to fetch departments:", err);

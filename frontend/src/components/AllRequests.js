@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../api";
 import { CSVLink } from "react-csv";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -41,7 +42,7 @@ const [selectedRequestId] = useState(null);
         status = "Accepted";
       }
   
-      const response = await axios.get("http://127.0.0.1:5001/all-requests", {
+      const response = await axios.get(`${API_BASE_URL}/all-requests`, {
         params: { status },
       });
   
@@ -74,7 +75,7 @@ const [selectedRequestId] = useState(null);
 
   const handleViewLetter = (letterPath) => {
     if (letterPath) {
-      window.open(`http://127.0.0.1:5001/uploads/${letterPath}`, "_blank");
+      window.open(`${API_BASE_URL}/uploads/${letterPath}`, "_blank");
     } else {
       alert("No approval letter available.");
     }
@@ -108,7 +109,7 @@ const [selectedRequestId] = useState(null);
             },
         });
 
-        const response = await axios.put(`http://127.0.0.1:5001/requests/${id}`, { status });
+        const response = await axios.put(`${API_BASE_URL}/requests/${id}`, { status });
 
         if (response.status === 200) {
             Swal.fire({
@@ -137,7 +138,7 @@ const submitRemarks = async (id) => {
     }
 
     try {
-        const response = await axios.put(`http://127.0.0.1:5001/requests/${id}/remarks`, { remarks: comment });
+        const response = await axios.put(`${API_BASE_URL}/requests/${id}/remarks`, { remarks: comment });
 
         if (response.status === 200) {
             alert("Remarks submitted successfully!");
@@ -159,7 +160,7 @@ const submitRemarks = async (id) => {
     }
   
     try {
-      const response = await axios.put(`http://127.0.0.1:5001/requests/${selectedRequestId}`, {
+      const response = await axios.put(`${API_BASE_URL}/requests/${selectedRequestId}`, {
         status: "Give Remarks",
         comment: comment,
       });
@@ -185,7 +186,7 @@ const submitRemarks = async (id) => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await axios.get("http://127.0.0.1:5001/api/departments");
+      const response = await axios.get(`${API_BASE_URL}/api/departments`);
       setDepartments(response.data);
     } catch (err) {
       console.error("Failed to fetch departments:", err);
